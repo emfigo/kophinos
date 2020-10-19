@@ -6,6 +6,13 @@ class Users {
   email : string
 }
 
+class UserAuthenticationDetails {
+  id : uuid
+  user_id : uuid
+  email : string
+  password : string
+}
+
 class Wallets {
   id : uuid
   customer_id : uuid
@@ -22,6 +29,7 @@ class Transfers {
   currency: str
 }
 
+Users "1" *--* "1*" UserAuthenticationDetails
 Users "1" *-- "0..*" Wallets
 Users "1" *-- "0..*" Transfers
 
