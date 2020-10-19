@@ -1,0 +1,29 @@
+@startuml
+class Users {
+  id : uuid
+  first_name : string
+  last_name : string
+  email : string
+}
+
+class Wallets {
+  id : uuid
+  customer_id : uuid
+  balance_cents: int
+  currency: str
+  token : string
+}
+
+class Transfers {
+  id : uuid
+  sender_customer_id : uuid
+  receiver_customer_id : uuid
+  balance_cents: int
+  currency: str
+}
+
+Users "1" *-- "0..*" Wallets
+Users "1" *-- "0..*" Transfers
+
+@enduml
+
