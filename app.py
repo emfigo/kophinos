@@ -1,7 +1,10 @@
 import sys
 from kophinos import app
+from kophinos.blueprints.users import users
 
 def main(argv):
+    app.register_blueprint(users)
+
     if argv[1] == 'api':
         app.run()
     else:

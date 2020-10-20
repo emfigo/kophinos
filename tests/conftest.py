@@ -5,6 +5,7 @@ import pytest
 from unittest import mock
 
 from kophinos import app, db
+from kophinos.blueprints.users import users
 
 @pytest.fixture(scope='function')
 def database(request):
@@ -28,6 +29,8 @@ def testapp():
     app.config['TESTING'] = True
     app.response_class = MyResponse
     app.test_client_class = FlaskClient
+
+    app.register_blueprint(users)
 
     return app
 
