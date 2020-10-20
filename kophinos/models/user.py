@@ -2,8 +2,10 @@ from datetime import datetime
 import uuid
 from sqlalchemy import Column, String, ForeignKey
 import sqlalchemy.dialects.postgresql as postgresql
+from sqlalchemy.exc import IntegrityError
 
 from kophinos import db
+from kophinos.exceptions import InvalidUser
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -19,8 +21,15 @@ class User(db.Model):
 
         user = User( first_name=first_name, last_name=last_name, email=email)
 
-        db.session.add(user)
-        db.session.commit()
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except IntegrityError as err:
+            error_info = err.orig.args[0]
+
+            raise InvalidUser(error_info)
+        finally:
+            db.session.rollback()
 
         return user
 

@@ -2,8 +2,10 @@ from datetime import datetime
 import uuid
 from sqlalchemy import Column, String, ForeignKey
 import sqlalchemy.dialects.postgresql as postgresql
+from sqlalchemy.exc import IntegrityError
 
 from kophinos import db
+from kophinos.exceptions import InvalidUserAuthenticationDetails
 
 class UserAuthenticationDetail(db.Model):
     __tablename__ = 'user_authentication_details'
@@ -19,8 +21,16 @@ class UserAuthenticationDetail(db.Model):
 
         user_authentication_detail = UserAuthenticationDetail( email=email, password=password, user_id=user.id)
 
-        db.session.add(user_authentication_detail)
-        db.session.commit()
+        try:
+            db.session.add(user_authentication_detail)
+            db.session.commit()
+        except IntegrityError as err:
+            error_info = err.orig.args[0]
+
+            raise InvalidUserAuthenticationDetails(error_info)
+        finally:
+            db.session.rollback()
+
 
         return user_authentication_detail
 

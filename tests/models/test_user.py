@@ -1,6 +1,7 @@
 import pytest
 import uuid
 
+from kophinos.exceptions import InvalidUser
 from kophinos.models.user import User
 
 @pytest.mark.usefixtures('database')
@@ -35,6 +36,28 @@ class TestUser:
         assert user.first_name == self.first_name
         assert user.last_name == self.last_name
         assert user.email == self.email
+
+    @pytest.mark.parametrize('invalid_detail', [
+        {'first_name': None},
+        {'last_name': None},
+        {'email': None}
+    ])
+    def test_does_not_create_user_with_empty_mandatory_details(self, database, invalid_detail):
+        prev_count = User.query.count()
+
+        with pytest.raises(InvalidUser):
+            user = User.create(
+                **{
+                    **{
+                        'first_name': self.first_name,
+                        'last_name': self.last_name,
+                        'email': self.email
+                    },
+                    **invalid_detail
+                }
+            )
+
+        assert User.query.count() == prev_count
 
     def test_converts_user_to_dict(self, database):
         user = User.create(
