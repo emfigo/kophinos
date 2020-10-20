@@ -3,8 +3,10 @@ python-dotenv==0.14.0
 # Database
 Flask-SQLAlchemy==2.4.4
 Flask-Migrate==2.5.3
+flask-login==0.5.0
 psycopg2==2.8.6
 
 # Test and Debug
 pytest==6.1.0
 ipdb==0.13.3
+freezegun==1.0.0

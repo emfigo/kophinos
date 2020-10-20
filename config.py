@@ -12,3 +12,4 @@ else:
 
 
 DATABASE_URI = os.environ['DATABASE_URI']
+KOPHINOS_API_SECRET = os.environ['KOPHINOS_API_SECRET']

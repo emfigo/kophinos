@@ -5,7 +5,7 @@ from kophinos.models.user import User
 from kophinos.services.user_create import UserCreate
 
 @pytest.mark.usefixtures('testapp', 'database')
-class TestBlueprintPaymentMethods:
+class TestBlueprintUsers:
     user_details = {
         'first_name': 'test',
         'last_name': 'Test',
@@ -13,7 +13,7 @@ class TestBlueprintPaymentMethods:
         'password': 'Som3r3allyD1ff1cultPa$$word!'
     }
 
-    def test_creates_sale_when_all_details_are_valid(self, testapp, database):
+    def test_creates_user_when_all_details_are_valid(self, testapp, database):
         client = testapp.test_client()
 
         response = client.post('/users', json=self.user_details)

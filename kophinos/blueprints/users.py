@@ -1,4 +1,3 @@
-
 from flask import Blueprint, request, jsonify
 from http import HTTPStatus
 
@@ -16,4 +15,3 @@ def create():
         return jsonify('The user details are incorrect. Please try new ones.'), HTTPStatus.BAD_REQUEST
 
     return jsonify(user_authentication_details.user_id), HTTPStatus.CREATED
-
