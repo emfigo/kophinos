@@ -1,6 +1,7 @@
 import pytest
 import uuid
 
+from kophinos import hashing
 from kophinos.exceptions import InvalidUserAuthenticationDetails
 from kophinos.models.user import User
 from kophinos.models.user_authentication_detail import UserAuthenticationDetail
@@ -10,7 +11,7 @@ class TestUserAuthenticationDetail:
     first_name = 'test'
     last_name = 'test'
     email = 'test.test@reallycool.test'
-    password = 'somehashedversionpswd'
+    password = 'someversionpswd'
 
     def test_creates_user_authentication_details_with_all_expected_attributes(self, database):
         user = User.create(
@@ -42,7 +43,8 @@ class TestUserAuthenticationDetail:
         assert user_authentication_detail.updated_at is not None
 
         assert user_authentication_detail.email == self.email
-        assert user_authentication_detail.password == self.password
+        assert user_authentication_detail.password != self.password
+        assert user_authentication_detail.password == hashing.hash(self.password)
         assert user_authentication_detail.user_id == user.id
 
     def test_does_not_create_user_authentication_details_with_non_existing_user(self, database):
@@ -119,7 +121,7 @@ class TestUserAuthenticationDetail:
             user_authentication_detail = UserAuthenticationDetail.create(
                 user = user,
                 email = self.email,
-                password = 'someotherhashedpassword'
+                password = 'someotherpassword'
             )
 
         assert UserAuthenticationDetail.query.count() == prev_count

@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from kophinos import db
 from kophinos.exceptions import InvalidUserAuthenticationDetails
+from kophinos import hashing
 
 class UserAuthenticationDetail(db.Model):
     __tablename__ = 'user_authentication_details'
@@ -19,7 +20,11 @@ class UserAuthenticationDetail(db.Model):
     @classmethod
     def create(kls, user, email: str, password: str):
 
-        user_authentication_detail = UserAuthenticationDetail( email=email, password=password, user_id=user.id)
+        user_authentication_detail = UserAuthenticationDetail(
+            email = email,
+            password = hashing.hash(password),
+            user_id = user.id
+        )
 
         try:
             db.session.add(user_authentication_detail)
@@ -38,7 +43,7 @@ class UserAuthenticationDetail(db.Model):
     def find_by_email_and_password(kls, email: str, password: str):
         return kls.query.filter_by(
             email = email,
-            password = password
+            password = hashing.hash(password)
         ).first()
 
     @classmethod

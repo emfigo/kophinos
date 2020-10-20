@@ -15,5 +15,7 @@ class TestHashing:
         ''.join(secrets.choice(ascii_letters + digits + punctuation) for i in range(PASSWORD_SIZE))
     ])
     def test_hash_word(self, word):
-        assert hash(word) == str(hashlib.sha256(word.encode()))
+        assert hash(word) == str(hashlib.sha256(word.encode()).hexdigest())
 
+    def test_hash_returns_none_when_none_value(self):
+        assert hash(None) is None
