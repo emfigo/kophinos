@@ -33,7 +33,7 @@ class Transfers {
   id : uuid
   sender_user_id : uuid
   receiver_user_id : uuid
-  balance_cents: int
+  amount_cents: int
   currency: str
   created_at: utc_date
 }

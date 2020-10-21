@@ -19,7 +19,8 @@ def database(request):
         try:
             meta = db.metadata
             for table in reversed(meta.sorted_tables):
-                db.session.execute(table.delete())
+                if table.name != 'alembic_version':
+                    db.session.execute(table.delete())
 
             db.session.commit()
         finally:
