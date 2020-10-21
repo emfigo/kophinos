@@ -50,6 +50,12 @@ class Wallet(db.Model):
             currency = currency.name
         ).first()
 
+    @classmethod
+    def find_all_by_user(kls, user):
+        return kls.query.filter_by(
+            user_id = user.id,
+        ).all()
+
     def add_operation(self, amount_cents: int, type: TransactionType):
         if type == TransactionType.DEBIT:
             self.balance_cents -= amount_cents

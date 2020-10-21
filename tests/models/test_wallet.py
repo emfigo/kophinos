@@ -115,6 +115,28 @@ class TestUser:
         assert Wallet.find_by_user_and_currency(user2, self.currency) is None
         assert Wallet.find_by_user_and_currency(user, self.currency) == wallet
 
+    def test_find_all_by_user_returns_all_expected_wallets(self, database):
+        user = User.create(
+            first_name = self.first_name,
+            last_name = self.last_name,
+            email = self.email
+        )
+
+        user2 = User.create(
+            first_name = self.first_name,
+            last_name = self.last_name,
+            email = 'someotheremail@test.test'
+        )
+
+        wallet = Wallet.create(
+            user,
+            self.currency
+        )
+
+        assert Wallet.query.count() == 1
+        assert Wallet.find_all_by_user(user2) == []
+        assert Wallet.find_all_by_user(user) == [wallet]
+
     @pytest.mark.parametrize('operation', [
         (100000, TransactionType.CREDIT, 100000),
         (100000, TransactionType.DEBIT, -100000)
