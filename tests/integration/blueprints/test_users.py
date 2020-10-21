@@ -1,7 +1,7 @@
 from http import HTTPStatus
 import pytest
 
-from kophinos.models.user import User
+from kophinos.models.user_authentication_detail import UserAuthenticationDetail
 from kophinos.services.user_create import UserCreate
 
 @pytest.mark.usefixtures('testapp', 'database')
@@ -18,10 +18,18 @@ class TestBlueprintUsers:
 
         response = client.post('/users', json=self.user_details)
 
-        user = User.find_by_email(self.user_details['email'])
+        user_authentication_details = UserAuthenticationDetail.find_by_email_and_password(
+            self.user_details['email'],
+            self.user_details['password']
+        )
 
         assert response.status_code == HTTPStatus.CREATED
-        assert response.json == str(user.id)
+        assert response.json == {
+            'id': str(user_authentication_details.id),
+            'email': self.user_details['email'],
+            'updated_at': int(user_authentication_details.updated_at.timestamp()),
+            'created_at': int(user_authentication_details.created_at.timestamp())
+        }
 
     @pytest.mark.parametrize('invalid_detail', [
         {'first_name': None},

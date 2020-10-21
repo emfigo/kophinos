@@ -97,3 +97,4 @@ class TestUser:
         assert User.query.count() == 1
         assert User.find_by_id(uuid.uuid4()) is None
         assert User.find_by_id(user.id) == user
+

@@ -242,3 +242,26 @@ class TestUserAuthenticationDetail:
         assert UserAuthenticationDetail.find_by_token('') is None
         assert UserAuthenticationDetail.find_by_token(None) is None
         assert UserAuthenticationDetail.find_by_token(user_authentication_detail.token) == user_authentication_detail
+
+    def test_converts_user_authentication_details_as_dict(self, database):
+        user = User.create(
+            first_name = self.first_name,
+            last_name = self.last_name,
+            email = self.email
+        )
+
+        user_authentication_detail = UserAuthenticationDetail.create(
+            user = user,
+            email = self.email,
+            password = self.password
+        )
+
+        expected_dict = {
+            'id': user_authentication_detail.id,
+            'email': user_authentication_detail.email,
+            'updated_at': int(user_authentication_detail.updated_at.timestamp()),
+            'created_at': int(user_authentication_detail.created_at.timestamp())
+        }
+
+        assert user_authentication_detail.as_dict() == expected_dict
+

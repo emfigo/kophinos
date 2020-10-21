@@ -111,3 +111,11 @@ class UserAuthenticationDetail(db.Model, flask_login.UserMixin):
 
         db.session.add(self)
         db.session.commit()
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'updated_at': int(self.updated_at.timestamp()),
+            'created_at': int(self.created_at.timestamp())
+        }
