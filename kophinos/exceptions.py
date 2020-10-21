@@ -9,3 +9,6 @@ class InvalidCurrency(Exception):
 
 class InvalidWallet(Exception):
     pass
+
+class InvalidTransaction(Exception):
+    pass

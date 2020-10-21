@@ -6,13 +6,19 @@ import sqlalchemy.dialects.postgresql as postgresql
 from sqlalchemy.exc import IntegrityError
 
 from kophinos import db
-from kophinos.exceptions import InvalidWallet
+from kophinos.exceptions import InvalidWallet, InvalidTransaction
 
 @unique
 class TransactionType(Enum):
     CREDIT = 0
     DEBIT = 1
 
+    @classmethod
+    def get(kls, name: str):
+        try:
+            return getattr(kls, name.upper())
+        except:
+            raise InvalidTransaction
 
 class Transaction(db.Model):
     __tablename__ = 'transactions'
@@ -23,11 +29,14 @@ class Transaction(db.Model):
     created_at = Column(postgresql.TIMESTAMP(timezone=True), nullable=False, default=datetime.utcnow)
 
     @classmethod
-    def create(kls, wallet, amount_cents: int, type: TransactionType):
+    def create(kls, wallet, amount_cents: int, transaction_type: TransactionType):
+        if type(amount_cents) is not int:
+            raise InvalidTransaction
+
         transaction = Transaction(
             wallet_id = wallet.id,
             amount_cents = amount_cents,
-            type = type.name
+            type = transaction_type.name
         )
 
         try:

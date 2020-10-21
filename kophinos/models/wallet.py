@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from kophinos import db
 from kophinos.exceptions import InvalidUser, InvalidCurrency
 from kophinos.models.currency import Currency
+from kophinos.models.transaction import TransactionType
 
 class Wallet(db.Model):
     __tablename__ = 'wallets'
@@ -48,4 +49,13 @@ class Wallet(db.Model):
             user_id = user.id,
             currency = currency.name
         ).first()
+
+    def add_operation(self, amount_cents: int, type: TransactionType):
+        if type == TransactionType.DEBIT:
+            self.balance_cents -= amount_cents
+        elif type == TransactionType.CREDIT:
+            self.balance_cents += amount_cents
+
+        db.session.add(self)
+        db.session.commit()
 

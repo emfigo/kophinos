@@ -2,9 +2,10 @@ import pytest
 import uuid
 
 from kophinos.exceptions import InvalidUser, InvalidCurrency
+from kophinos.models.currency import Currency
+from kophinos.models.transaction import TransactionType
 from kophinos.models.user import User
 from kophinos.models.wallet import Wallet
-from kophinos.models.currency import Currency
 
 @pytest.mark.usefixtures('database')
 class TestUser:
@@ -113,3 +114,26 @@ class TestUser:
         assert Wallet.query.count() == 1
         assert Wallet.find_by_user_and_currency(user2, self.currency) is None
         assert Wallet.find_by_user_and_currency(user, self.currency) == wallet
+
+    @pytest.mark.parametrize('operation', [
+        (100000, TransactionType.CREDIT, 100000),
+        (100000, TransactionType.DEBIT, -100000)
+    ])
+    def test_add_operation_modifies_wallet_balance_accordingly(self, database, operation):
+        user = User.create(
+            first_name = self.first_name,
+            last_name = self.last_name,
+            email = self.email
+        )
+
+        wallet = Wallet.create(
+            user,
+            self.currency
+        )
+
+        assert wallet.balance_cents == 0
+
+        wallet.add_operation(operation[0], operation[1])
+
+        assert wallet.balance_cents == operation[2]
+
