@@ -55,4 +55,10 @@ class Transaction(db.Model):
             wallet_id = wallet.id,
         ).all()
 
-
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'amount_cents': self.amount_cents,
+            'type': self.type,
+            'created_at': int(self.created_at.timestamp())
+        }

@@ -3,6 +3,7 @@ import pytest
 
 from kophinos.models.currency import Currency
 from kophinos.models.wallet import Wallet
+from kophinos.models.transaction import Transaction
 from kophinos.services.user_create import UserCreate
 
 @pytest.mark.usefixtures('testapp', 'database')
@@ -16,6 +17,11 @@ class TestBlueprintWallets:
 
     wallet_details = {
         'currency': Currency.SGD.name
+    }
+
+    transaction_details = {
+        'amount_cents': 100000,
+        'type': 'CREDIT'
     }
 
     def test_creates_wallet_when_all_details_are_valid(self, testapp, database):
@@ -128,6 +134,129 @@ class TestBlueprintWallets:
         client = testapp.test_client()
 
         response = client.get(f"/wallets/{self.wallet_details['currency']}")
+
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
+        assert response.json == 'unauthorized'
+
+    def test_creates_expected_wallet_transaction_when_authenticated_and_valid_details(self, testapp, database):
+        client = testapp.test_client()
+
+        client.post('/users', json=self.user_details)
+        response = client.post('/login', json=self.user_details)
+
+        headers = {
+            'Authorization': f"Basic {response.json}"
+        }
+
+        client.post('/wallets', headers=headers, json=self.wallet_details)
+
+        response = client.post(f"/wallets/{self.wallet_details['currency']}/transactions", headers=headers, json=self.transaction_details)
+
+        assert Transaction.query.count() == 1
+
+        wallet = Wallet.query.first()
+        transaction = Transaction.query.first()
+        transaction_dict = transaction.as_dict()
+        transaction_dict['id'] = str(transaction_dict['id'])
+
+        assert response.status_code == HTTPStatus.CREATED
+        assert response.json == transaction_dict
+
+    def test_returns_error_message_when_authenticated_and_non_existing_wallet_transactions(self, testapp, database):
+        client = testapp.test_client()
+
+        client.post('/users', json=self.user_details)
+        response = client.post('/login', json=self.user_details)
+
+        headers = {
+            'Authorization': f"Basic {response.json}"
+        }
+
+        response = client.post(f"/wallets/{self.wallet_details['currency']}/transactions", headers=headers, json=self.transaction_details)
+
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.json == 'Invalid account. Account does not exist for user.'
+
+    @pytest.mark.parametrize('invalid_detail', [
+        {'amount_cents': None },
+        {'amount_cents': '1000000' },
+        {'amount_cents': 'hello' },
+        {'type': None },
+        {'type': 'NONEXISTING' }
+    ])
+    def test_returns_error_message_when_authenticated_and_invalid_transaction_details(self, testapp, database, invalid_detail):
+        client = testapp.test_client()
+
+        client.post('/users', json=self.user_details)
+        response = client.post('/login', json=self.user_details)
+
+        headers = {
+            'Authorization': f"Basic {response.json}"
+        }
+
+        client.post('/wallets', headers=headers, json=self.wallet_details)
+
+        response = client.post(f"/wallets/{self.wallet_details['currency']}/transactions", headers=headers, json={ **self.transaction_details, **invalid_detail })
+
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.json == 'Invalid transaction. Please change transaction details.'
+
+    def test_returns_error_message_transactions_when_not_authenticated(self, testapp, database):
+        client = testapp.test_client()
+
+        response = client.post(f"/wallets/{self.wallet_details['currency']}/transactions", json=self.transaction_details)
+
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
+        assert response.json == 'unauthorized'
+
+    def test_returns_expected_wallet_transaction_when_authenticated_and_valid_details(self, testapp, database):
+        client = testapp.test_client()
+
+        client.post('/users', json=self.user_details)
+        response = client.post('/login', json=self.user_details)
+
+        headers = {
+            'Authorization': f"Basic {response.json}"
+        }
+
+        client.post('/wallets', headers=headers, json=self.wallet_details)
+
+        response = client.get(f"/wallets/{self.wallet_details['currency']}/transactions", headers=headers)
+        assert response.status_code == HTTPStatus.OK
+        assert response.json == []
+
+        client.post(f"/wallets/{self.wallet_details['currency']}/transactions", headers=headers, json=self.transaction_details)
+
+        response = client.get(f"/wallets/{self.wallet_details['currency']}/transactions", headers=headers)
+        assert Transaction.query.count() == 1
+
+        wallet = Wallet.query.first()
+        transaction = Transaction.query.first()
+        transaction_dict = transaction.as_dict()
+        transaction_dict['id'] = str(transaction_dict['id'])
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.json == [transaction_dict]
+
+    def test_get_returns_error_message_when_authenticated_and_non_existing_wallet_transactions(self, testapp, database):
+        client = testapp.test_client()
+
+        client.post('/users', json=self.user_details)
+        response = client.post('/login', json=self.user_details)
+
+        headers = {
+            'Authorization': f"Basic {response.json}"
+        }
+
+        response = client.get(f"/wallets/{self.wallet_details['currency']}/transactions", headers=headers)
+
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.json == 'Invalid account. Account does not exist for user.'
+
+    def test_returns_error_message_get_transactions_when_not_authenticated(self, testapp, database):
+        client = testapp.test_client()
+
+        response = client.get(f"/wallets/{self.wallet_details['currency']}/transactions")
 
         assert response.status_code == HTTPStatus.UNAUTHORIZED
         assert response.json == 'unauthorized'
