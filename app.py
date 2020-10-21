@@ -1,11 +1,13 @@
 import sys
 from kophinos import app
 from kophinos.blueprints.users import users
+from kophinos.blueprints.wallets import wallets
 from kophinos.blueprints.authentication import authentication
 
 def main(argv):
-    app.register_blueprint(users)
     app.register_blueprint(authentication)
+    app.register_blueprint(users)
+    app.register_blueprint(wallets)
 
     if argv[1] == 'api':
         app.run()

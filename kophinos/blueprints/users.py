@@ -5,11 +5,9 @@ from http import HTTPStatus
 from kophinos.exceptions import InvalidUser
 from kophinos.services.user_create import UserCreate
 from kophinos.models.user import User
-from kophinos.models.user_authentication_detail import UserAuthenticationDetail
 from kophinos.models.wallet import Wallet
 
 users = Blueprint('users', __name__)
-
 
 @users.route('/users', methods=['POST'])
 def create():

@@ -6,6 +6,7 @@ from unittest import mock
 
 from kophinos import app, db
 from kophinos.blueprints.users import users
+from kophinos.blueprints.wallets import wallets
 from kophinos.blueprints.authentication import authentication
 
 @pytest.fixture(scope='function')
@@ -32,8 +33,9 @@ def testapp():
     app.response_class = MyResponse
     app.test_client_class = FlaskClient
 
-    app.register_blueprint(users)
     app.register_blueprint(authentication)
+    app.register_blueprint(users)
+    app.register_blueprint(wallets)
 
     return app
 
