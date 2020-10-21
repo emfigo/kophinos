@@ -137,6 +137,28 @@ class TestUser:
         assert Wallet.find_all_by_user(user2) == []
         assert Wallet.find_all_by_user(user) == [wallet]
 
+    def test_as_dict_converts_wallet_into_expected_dict(self, database):
+        user = User.create(
+            first_name = self.first_name,
+            last_name = self.last_name,
+            email = self.email
+        )
+
+        wallet = Wallet.create(
+            user,
+            self.currency
+        )
+
+        expected_dict = {
+            'id': wallet.id,
+            'currency': wallet.currency,
+            'balance_cents': wallet.balance_cents,
+            'updated_at': int(wallet.updated_at.timestamp()),
+            'created_at': int(wallet.created_at.timestamp())
+        }
+
+        assert wallet.as_dict() == expected_dict
+
     @pytest.mark.parametrize('operation', [
         (100000, TransactionType.CREDIT, 100000),
         (100000, TransactionType.DEBIT, -100000)

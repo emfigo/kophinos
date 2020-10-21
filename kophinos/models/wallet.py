@@ -65,3 +65,12 @@ class Wallet(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'currency': self.currency,
+            'balance_cents': self.balance_cents,
+            'updated_at': int(self.updated_at.timestamp()),
+            'created_at': int(self.created_at.timestamp())
+        }
+
