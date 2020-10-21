@@ -34,12 +34,12 @@ class TestUser:
         ).first().id == wallet.id
         assert wallet.id is not None
 
-        assert wallet.query.filter_by(
+        assert Wallet.query.filter_by(
             user_id = user.id
         ).first().created_at == wallet.created_at
         assert wallet.created_at is not None
 
-        assert wallet.query.filter_by(
+        assert Wallet.query.filter_by(
             user_id = user.id
         ).first().updated_at == wallet.updated_at
         assert wallet.updated_at is not None
@@ -91,3 +91,25 @@ class TestUser:
             )
 
         assert Wallet.query.count() == prev_count
+
+    def test_finds_by_id_returns_the_expected_user(self, database):
+        user = User.create(
+            first_name = self.first_name,
+            last_name = self.last_name,
+            email = self.email
+        )
+
+        user2 = User.create(
+            first_name = self.first_name,
+            last_name = self.last_name,
+            email = 'someotheremail@test.test'
+        )
+
+        wallet = Wallet.create(
+            user,
+            self.currency
+        )
+
+        assert Wallet.query.count() == 1
+        assert Wallet.find_by_user_and_currency(user2, self.currency) is None
+        assert Wallet.find_by_user_and_currency(user, self.currency) == wallet

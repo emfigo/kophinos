@@ -41,3 +41,11 @@ class Wallet(db.Model):
             db.session.rollback()
 
         return wallet
+
+    @classmethod
+    def find_by_user_and_currency(kls, user, currency: Currency):
+        return kls.query.filter_by(
+            user_id = user.id,
+            currency = currency.name
+        ).first()
+
