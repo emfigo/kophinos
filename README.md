@@ -13,6 +13,10 @@ mobile wallet as a service.
 - The receiver user is specified by email (seems the most intuitive way to find somebody to send
 money to), even though I would add the possibility to specify phone or other details, but leaving
 this out of scope.
+- To reduce scope and since there is no explicit requirement, I will allow a user's wallet to be
+in a negative balance. (This can be changed easily)
+- The authentication logic is pretty simple, so to reduce scope the token generated for
+authentication does not expire.
 
 ### Requirements
 
