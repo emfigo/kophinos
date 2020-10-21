@@ -75,8 +75,6 @@ For rollback:
 make rollback
 ```
 
-No need to migrate test, all this will be taken care for you automatically.
-
 #### Running tests
 
 Is really important at this point that you have a DB running so you can point the test to. The previous point gives you an example of how to do it. Now you need to set up your testing environment.
@@ -86,6 +84,11 @@ Is really important at this point that you have a DB running so you can point th
 Modify the values accordingly
 ```bash
 cp .sample.env .test.env
+```
+
+Run migrations on testing environment
+```bash
+APP_ENV=test make migrate
 ```
 
 Once this is done and all env variables are changed to the correct values. Run:

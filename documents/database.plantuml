@@ -11,22 +11,23 @@ class UserAuthenticationDetails {
   user_id : uuid
   email : string
   password : string
+  token: string
 }
 
 class Wallets {
   id : uuid
-  customer_id : uuid
+  user_id : uuid
   balance_cents: int
   currency: str
-  token : string
 }
 
 class Transfers {
   id : uuid
-  sender_customer_id : uuid
-  receiver_customer_id : uuid
+  sender_user_id : uuid
+  receiver_user_id : uuid
   balance_cents: int
   currency: str
+  created_at: utc_date
 }
 
 Users "1" *--* "1*" UserAuthenticationDetails

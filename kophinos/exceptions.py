@@ -4,3 +4,5 @@ class InvalidUser(Exception):
 class InvalidUserAuthenticationDetails(Exception):
     pass
 
+class InvalidCurrency(Exception):
+    pass
