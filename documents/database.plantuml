@@ -21,6 +21,14 @@ class Wallets {
   currency: str
 }
 
+class Transactions {
+  id : uuid
+  wallet_id : uuid
+  amount_cents: int
+  type: str [credit | debit]
+  created_at: utc_date
+}
+
 class Transfers {
   id : uuid
   sender_user_id : uuid
@@ -33,6 +41,7 @@ class Transfers {
 Users "1" *--* "1*" UserAuthenticationDetails
 Users "1" *-- "0..*" Wallets
 Users "1" *-- "0..*" Transfers
+Wallets "1" *-- "0..*" Transactions
 
 @enduml
 

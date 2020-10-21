@@ -6,3 +6,6 @@ class InvalidUserAuthenticationDetails(Exception):
 
 class InvalidCurrency(Exception):
     pass
+
+class InvalidWallet(Exception):
+    pass
