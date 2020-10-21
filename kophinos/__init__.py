@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 import flask_login
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -7,7 +7,7 @@ from http import HTTPStatus
 from config import DATABASE_URI, KOPHINOS_API_SECRET
 
 def unauthorized_handler():
-    return 'unauthorized', HTTPStatus.UNAUTHORIZED
+    return jsonify('unauthorized'), HTTPStatus.UNAUTHORIZED
 
 app = Flask(__name__)
 app.secret_key = KOPHINOS_API_SECRET

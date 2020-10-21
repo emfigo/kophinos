@@ -1,8 +1,10 @@
 from http import HTTPStatus
 import pytest
 
+from kophinos.models.currency import Currency
 from kophinos.models.user_authentication_detail import UserAuthenticationDetail
 from kophinos.services.user_create import UserCreate
+from kophinos.services.wallet_create import WalletCreate
 
 @pytest.mark.usefixtures('testapp', 'database')
 class TestBlueprintUsers:
@@ -44,3 +46,50 @@ class TestBlueprintUsers:
 
         assert response.status_code == HTTPStatus.BAD_REQUEST
         assert response.json == 'The user details are incorrect. Please try new ones.'
+
+    def test_retrieves_empty_list_when_no_wallets_for_user_when_authenticated(self, testapp, database):
+        client = testapp.test_client()
+
+        client.post('/users', json=self.user_details)
+        response = client.post('/login', json=self.user_details)
+
+        headers = {
+            'Authorization': f"Basic {response.json}"
+        }
+
+        response = client.get('/users/wallets', headers=headers)
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.json == []
+
+    def test_retrieves_wallets_for_user_when_authenticated(self, testapp, database):
+        client = testapp.test_client()
+        details = { 'currency': Currency.SGD.name }
+
+        client.post('/users', json=self.user_details)
+        response = client.post('/login', json=self.user_details)
+
+        wallet = WalletCreate.call(response.json, details)
+
+        wallet_dict = wallet.as_dict()
+        wallet_dict['id'] = str(wallet_dict['id'])
+
+        headers = {
+            'Authorization': f"Basic {response.json}"
+        }
+
+        response = client.get('/users/wallets', headers=headers)
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.json == [wallet_dict]
+
+    def test_does_not_retrive_any_wallet_when_no_authenticated(self, testapp, database):
+        client = testapp.test_client()
+
+        client.post('/users', json=self.user_details)
+
+        response = client.get('/users/wallets')
+
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
+        assert response.json == 'unauthorized'
+
