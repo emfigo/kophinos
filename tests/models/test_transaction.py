@@ -81,3 +81,26 @@ class TestTransaction:
             )
 
         assert Transaction.query.count() == prev_count
+
+    def test_find_all_transactions_with_valid_wallet(self, database):
+        user = User.create(
+            first_name = self.first_name,
+            last_name = self.last_name,
+            email = self.email
+        )
+
+        wallet = Wallet.create(
+            user,
+            self.currency
+        )
+
+        assert Transaction.find_all_by_wallet(wallet) == []
+
+        transaction = Transaction.create(
+            wallet,
+            self.amount_cents,
+            self.type
+
+        )
+
+        assert Transaction.find_all_by_wallet(wallet) == [transaction]

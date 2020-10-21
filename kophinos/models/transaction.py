@@ -49,3 +49,10 @@ class Transaction(db.Model):
 
         return transaction
 
+    @classmethod
+    def find_all_by_wallet(kls, wallet):
+        return kls.query.filter_by(
+            wallet_id = wallet.id,
+        ).all()
+
+
