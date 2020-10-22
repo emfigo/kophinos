@@ -30,7 +30,7 @@ class Transaction(db.Model):
 
     @classmethod
     def create(kls, wallet, amount_cents: int, transaction_type: TransactionType):
-        if type(amount_cents) is not int:
+        if type(amount_cents) is not int or amount_cents < 0:
             raise InvalidTransaction
 
         transaction = Transaction(

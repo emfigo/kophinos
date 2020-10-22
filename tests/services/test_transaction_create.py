@@ -1,4 +1,3 @@
-
 import pytest
 
 from kophinos.exceptions import InvalidTransaction, InvalidWallet

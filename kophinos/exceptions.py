@@ -12,3 +12,6 @@ class InvalidWallet(Exception):
 
 class InvalidTransaction(Exception):
     pass
+
+class InvalidTransfer(Exception):
+    pass
