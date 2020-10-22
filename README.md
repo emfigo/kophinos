@@ -13,10 +13,15 @@ mobile wallet as a service.
 - The receiver user is specified by email (seems the most intuitive way to find somebody to send
 money to), even though I would add the possibility to specify phone or other details, but leaving
 this out of scope.
-- To reduce scope and since there is no explicit requirement, I will allow a user's wallet to be
-in a negative balance. (This can be changed easily)
-- The authentication logic is pretty simple, so to reduce scope the token generated for
-authentication does not expire.
+- To really focus the code on the problem I didn't add boiler plate code to add swagger for the
+api documentation, but I would add the API client documentation on top of this. On the demo section you can find all the endpoints and how do they work.
+- To reduce scope and because there are no explicit requirements, a few things were simplified:
+  - PPI data like customer information are store in the DB with the rest of the data.
+  - Even though I'm using tokens, I have not introduced any mechanism for expiration of the token (more security)
+  - There is no end to end encryption on the communication.
+  - I allow a user's wallet to be in a negative balance. (This can be changed easily)
+  - You can create a user through the API, but the functionality is pretty basic. You won't be able to do more things like patching or reading information from the user.
+  - Error messages in the API are really basic. No presenters
 
 ### Requirements
 
@@ -116,11 +121,78 @@ python app.py api
 ```
 Anything else will show you an error message.
 
+## Demo
+
+The API has available the following endpoints, running locally:
+
+
+- **Create user**
+
+ [POST] http://127.0.0.1:5000/users
+![](./documents/create_user.png)
+
+- **Login**
+
+ [POST] http://127.0.0.1:5000/login
+![](./documents/user_login.png)
+
+**NOTE:** From this point you need to be authenticated. Add user token to your headers
+![](./documents/user_headers.png)
+
+- **Logout**
+
+[GET] http://127.0.0.1:5000/logout
+![](./documents/user_logout.png)
+
+- **Create wallet**
+
+[POST] http://127.0.0.1:5000/wallets
+![](./documents/wallet_create.png)
+
+- **Read all wallets**
+
+[GET] http://127.0.0.1:5000/users/wallets
+![](./documents/all_wallets.png)
+
+- **Read specific wallet**
+
+[GET] http://127.0.0.1:5000/wallets/SGD
+![](./documents/individual_wallet.png)
+
+- **Read specific wallet transactions**
+
+[GET] http://127.0.0.1:5000/wallets/SGD/transactions
+![](./documents/wallet_transactions.png)
+
+- **Create specific wallet transaction**
+
+[POST] http://127.0.0.1:5000/wallets/SGD/transactions
+![](./documents/create_transaction.png)
+
+- **Create specific wallet transfer**
+
+[POST] http://127.0.0.1:5000/wallets/SGD/transfers
+![](./documents/wallet_transfer.png)
+
+I invite you you hit all the endpoints after you have made an operation, so you can see
+how balances, wallets and transactions get affected.
+
+Make sure you are authenticated otherwise you will see the following message:
+![](./documents/unauthorized.png)
+
+Also remove some of the fields you can see in the pictures, or change the currency and
+you will see different error messages.
+
 ## Missings
 
-Aside from things that are mentioned before, I would add the following things:
+Aside from things what I mentioned before, I would add the following things:
 
 - Dockerise the app
-- Deployment process ( It could be something like kubernetes )
-- Alerting
-- Monitoring
+- Deployment process ( It could be something like kubernetes and is compatible with docker )
+- Alerting ( it can be as simple as adding honeybadger or maybe a more complex system with oncall support )
+- Monitoring ( Here I would mainly divide what is engineer focused and business focused ). Based on
+what I previously said, I would make sure we have the dashboards to understand what is going on.
+
+Also as a good feature I would add the possibility to make transfers between accounts no matter
+the currency used, and make the application make the currency change on real time based on the
+market value.
